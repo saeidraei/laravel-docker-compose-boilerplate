@@ -1,0 +1,46 @@
+version: '3'
+services:
+
+  # PHP Service
+  ldb_app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: ldb_app
+    restart: always
+    depends_on:
+      - ldb_db
+    volumes:
+      - ./src:/var/www/html/
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./docker/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
+  # Nginx Service
+  ldb_web:
+    image: nginx:alpine
+    container_name: ldb_web
+    working_dir: /var/www/html/
+    restart: always
+    depends_on:
+      - ldb_app
+    ports: 
+      - 8060:80
+    volumes:
+      - ./src:/var/www/html/
+      - ./docker/nginx/dev/conf.d:/etc/nginx/conf.d
+
+  ldb_db:
+    image: mysql:8.0.19
+    container_name: ldb_db
+    restart: always
+    environment:
+       MYSQL_ROOT_PASSWORD: localpassword
+       MYSQL_DATABASE: laravel
+    volumes:
+       - dbdata:/var/lib/mysql
+       - ./docker/mysql/conf.d:/etc/mysql/conf.d
+
+
+# Volumes
+volumes:
+  dbdata:
+    driver: local
