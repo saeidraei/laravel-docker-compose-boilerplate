@@ -29,7 +29,7 @@ services:
       - ./docker/nginx/dev/conf.d:/etc/nginx/conf.d
 
   ldb_db:
-    image: mysql:8.0.19
+    image: mysql:8.0.30
     container_name: ldb_db
     restart: always
     environment:
